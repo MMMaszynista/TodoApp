@@ -12,11 +12,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.todoapp.data.models.Task
 
 @Composable
-fun AddTaskDialog(onAdd: (String) -> Unit, onDismiss: () -> Unit) {
+fun AddTaskDialog(
+    taskToEdit: Task?,
+    onAdd: (String) -> Unit,
+    onUpdate: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
     var text by remember {
-        mutableStateOf("")
+        mutableStateOf(taskToEdit?.title ?: "")
     }
 
     AlertDialog(
@@ -25,13 +31,10 @@ fun AddTaskDialog(onAdd: (String) -> Unit, onDismiss: () -> Unit) {
         confirmButton = {
             Button(
                 onClick = {
-                    if (text.isNotBlank()) {
-                        onAdd(text)
-                        onDismiss()
-                    }
+                    if (taskToEdit == null) onAdd(text) else onUpdate(text)
                 }
             ) {
-                Text("Dodaj")
+                Text(if (taskToEdit == null) "Dodaj" else "Zapisz")
             }
         },
         dismissButton = {
@@ -39,7 +42,7 @@ fun AddTaskDialog(onAdd: (String) -> Unit, onDismiss: () -> Unit) {
                 Text("Anuluj")
             }
         },
-        title = { Text("Nowe zadanie") },
+        title = { Text(if (taskToEdit == null) "Nowe zadanie" else "Edytuj zadanie") },
         text = {
             OutlinedTextField(
                 colors = TextFieldDefaults.colors(),
@@ -54,5 +57,5 @@ fun AddTaskDialog(onAdd: (String) -> Unit, onDismiss: () -> Unit) {
 @Preview
 @Composable
 private fun AddTaskDialogPreview() {
-    AddTaskDialog(onAdd = {}) { }
+    AddTaskDialog(taskToEdit = null, onUpdate = {}, onAdd = {}) { }
 }

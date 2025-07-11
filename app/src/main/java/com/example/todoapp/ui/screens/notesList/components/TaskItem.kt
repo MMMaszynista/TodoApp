@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -22,7 +23,8 @@ import com.example.todoapp.ui.theme.LeafGreen
 @Composable
 fun TaskItem(
     task: Task,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onEdit: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -43,6 +45,11 @@ fun TaskItem(
         ) {
             Text(text = task.title, modifier = Modifier.weight(1f))
             IconButton(
+                onClick = onEdit
+            ) {
+                Icon(Icons.Default.Edit, contentDescription = "Edytuj")
+            }
+            IconButton(
                 onClick = onDelete
             ) {
                 Icon(Icons.Default.Check, contentDescription = "Usuń")
@@ -55,6 +62,6 @@ fun TaskItem(
 @Composable
 private fun TaskItemPreview() {
     TaskItem(
-        Task(title = "AAA")
+        Task(title = "AAA"),{}
     ) { }
 }

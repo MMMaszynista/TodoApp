@@ -2,6 +2,7 @@ package com.example.todoapp.ui.screens.notesList
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,6 +19,7 @@ import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -34,7 +36,7 @@ import com.example.todoapp.ui.theme.LightGreen
 fun TaskListScreen(viewModel: TaskViewModel = hiltViewModel()) {
     val tasks by viewModel.tasks.collectAsState()
     val showDialog by viewModel.showDialog.collectAsState()
-
+    val taskBeingEdited by viewModel.taskBeingEdited.collectAsState()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -69,22 +71,34 @@ fun TaskListScreen(viewModel: TaskViewModel = hiltViewModel()) {
     ) { innerPadding ->
 
         Column(
-            modifier = Modifier.padding(innerPadding)
-            ) {
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxSize().padding(innerPadding)
+        ) {
             Spacer(modifier = Modifier.height(8.dp))
-            LazyColumn {
-                items(tasks) { task ->
-                    TaskItem(task = task, onDelete = {
-                        viewModel.deleteTask(task)
-                    })
+
+            if (tasks.isEmpty()) {
+                Text("Aktualnie brak zadań")
+            } else {
+                LazyColumn {
+                    items(tasks) { task ->
+                        TaskItem(
+                            task = task,
+                            onDelete = {
+                                viewModel.deleteTask(task)
+                            },
+                            onEdit = { viewModel.editTask(task) }
+                        )
+                    }
                 }
             }
         }
 
         if (showDialog) {
             AddTaskDialog(
+                taskToEdit = taskBeingEdited,
                 onAdd = { title -> viewModel.addTask(title) },
-                onDismiss = { viewModel.dismissDialog() }
+                onDismiss = { viewModel.dismissDialog() },
+                onUpdate = { viewModel.updateTask(it) }
             )
         }
     }

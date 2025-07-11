@@ -27,15 +27,35 @@ class TaskViewModel @Inject constructor(
     private val _showDialog = MutableStateFlow(false)
     val showDialog: StateFlow<Boolean> = _showDialog
 
+    private val _taskBeingEdited = MutableStateFlow<Task?>(null)
+    val taskBeingEdited: StateFlow<Task?> = _taskBeingEdited
+
     fun addTask(title: String) {
         viewModelScope.launch {
             repository.insert(Task(title = title))
+            _showDialog.value = false
         }
     }
 
     fun deleteTask(task: Task) {
         viewModelScope.launch {
             repository.delete(task)
+        }
+    }
+
+    fun editTask(task: Task) {
+        _taskBeingEdited.value = task
+        _showDialog.value = true
+    }
+
+    fun updateTask(newTitle: String) {
+        val original = _taskBeingEdited.value
+        original?.let {
+            viewModelScope.launch {
+                repository.update(original.copy(title = newTitle))
+                _taskBeingEdited.value = null
+                _showDialog.value = false
+            }
         }
     }
 
